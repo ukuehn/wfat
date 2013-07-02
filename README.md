@@ -24,6 +24,6 @@ For options run
 Credits
 ---
 
-WFAT is developed by Ulrich Kuehn <ukuehn@acm.org> and is released under
+WFAT is developed by Ulrich Kuehn <ukuehn AT acm.org> and is released under
 the GPL v2 or later.
 
