@@ -50,7 +50,7 @@ Options
              into Gephi. Use -v to include host IP address as
              an extra node.
 
-  -r <file>  Read back XML output from <file> and replays the contents as
+  -r file    Read back XML output from file and replays the contents as
              responses to the requests that were made. Use to transform the
              output without doing the actual requests.
              Ignores the command line urls, -f, -F, -p, and -P options.
@@ -59,23 +59,23 @@ Options
              Useful for inserting the IP addresses if the original queries
              happened behind a proxy server.
 
-  -f <file>  Read urls from file <file> instead of
-             using command line args. Use - for stdin.
+  -f file    Read urls from file instead of using command line args.
+             Use - for stdin.
 
-  -d <n>     Wait for <n> milliseconds between requests.
+  -d n       Wait for n milliseconds between requests.
 
-  -u <agent> Use <agent> as user agent string in each request.
+  -u agent   Use agent as user agent string in each request.
 
-  -p <proto> Use <proto> as default for urls w/o explicitly given protocol,
+  -p proto   Use proto as default for urls w/o explicitly given protocol,
              defaults to 'http://'.
 
-  -X <file>  Consider any hosts give in <file> as forbidden. Do never query
+  -X file    Consider any hosts give in file as forbidden. Do never query
              any of these hosts, even when redirected to.
 
   -?         Print version, help and exit.
 
-  -P <proxyspec>  Specifiy HTTP proxy server. Formats for <proxyspec> are
-             <proxy>\[\:<port>\[\:<uid>\[\:<pw>\]\]\] or \[<uid>\[\:<pw>\]@]<proxy>\[\:<port>\]
+  -P proxyspec  Specifiy HTTP proxy server. Formats for proxyspec are
+             proxy\[\:port\[\:uid\[\:pw\]\]\] or \[uid\[\:pw\]@]proxy\[\:port\]
              with optional basic authentication using user id <uid> and
              password <pw>.
 
