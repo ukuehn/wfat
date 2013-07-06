@@ -124,11 +124,13 @@ public class WFATMain {
 		+"             any of these hosts, even when "
 		+"redirected to.\n\n"
 		+"  -?         Print version, help and exit.\n\n"
-		+"  -P <proxy>:<port>[:<uid>:<pw>] Use <proxy> as "
-		+"HTTP proxy on <port>\n"
-		+"             with optional basic authentication "
-		+"using user id <uid>\n"
-		+"             and password <pw>.\n\n";
+		+"  -P <proxyspec>  Specifiy HTTP proxy server. Formats for "
+		+"<proxyspec> are\n"
+		+"             <proxy>:<port>[:<uid>:<pw>] or "
+		+"[<uid>[:<pw>]@]<proxy>[:<port>]\n"
+		+"             with optional basic authentication using user "
+		+"id <uid> and\n"
+		+"             password <pw>.\n\n";
 
 	String warnGraphNoRedirect =
 		"Warning: using graph mode without following or allowing "
@@ -177,19 +179,54 @@ public class WFATMain {
 		int proxyPort = 8080;   // default value
 		String uid = null;
 		String pw = null;
-		StringTokenizer st = new StringTokenizer(proxyArg, ":");
+		StringTokenizer st;
+
+		if (proxyArg == null) {
+			return;
+		}
+
+		/* Try to parse [uid[:pw]@]host[:port], but if the
+                 * user part uid[:pw] is empty, accept also
+                 * host[:port[:uid[:pw]]]
+                 */
+		st = new StringTokenizer(proxyArg, "@");
+		String hostPart = null;
+		String userPart = null;
+		if (st.hasMoreTokens()) {
+			hostPart = st.nextToken();
+		}
+		if (st.hasMoreTokens()) {
+			// hostPart is actually userPart
+			// so shift it
+			userPart = hostPart;
+			hostPart = st.nextToken();
+		}
+
+		// we know that hostPart is non-null, as proxyArg is != null
+		st = new StringTokenizer(hostPart, ":");
+
 		if (st.hasMoreTokens()) {
 			proxyHost = st.nextToken();
 		}
 		if (st.hasMoreTokens()) {
 			sProxyPort = st.nextToken();
 		}
+
+		if (userPart != null) {
+			// if we have a userPart, ignore rest of
+			// hostPart after the port
+			st = new StringTokenizer(userPart, ":");
+		}
+
+		// Common part to parse uid[:pw] part, either from
+		// part left of @, or right of host:port
 		if (st.hasMoreTokens()) {
 			uid = st.nextToken();
 		}
 		if (st.hasMoreTokens()) {
 			pw = st.nextToken();
 		}
+		proxyPort = 8080;  // default port
 		if (sProxyPort != null) {
 			try {
 				proxyPort = Integer.parseInt(sProxyPort);
@@ -200,10 +237,8 @@ public class WFATMain {
 			}
 		}
 		if (proxyHost != null) {
-
 			//System.err.println("Setting proxy "
 			//		   +proxyHost+":"+sProxyPort);
-			
 			proxy = new Proxy(Proxy.Type.HTTP,
 					  new InetSocketAddress(proxyHost,
 								proxyPort));
