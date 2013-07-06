@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="WebForrestAnalysisToolkit" default="jar" basedir=".">
 
-  <property name="version" value="0.6"/>
+  <!--<property name="version" value="0.6"/>-->
 
 <!-- run native2ascii on the properties files, as these are expected
   in iso-8859-1 encoding, but we are using utf-8 -->
@@ -32,7 +32,7 @@
         />
     </manifest>
     <jar
-      jarfile="wfat-${version}.jar"
+      jarfile="wfat.jar"
       basedir="build"
       excludes="MANIFEST.MF"
       manifest="build/MANIFEST.MF"
@@ -40,9 +40,9 @@
   </target>
 
   <target name="src-dist">
-      <zip destfile="wfat-${version}-src.zip">
+      <zip destfile="wfat-src.zip">
 	<zipfileset
-	  prefix="wfat-${version}"
+	  prefix="wfat"
 	  dir="."
 	  >
 	  <include name="src/**/*.java"/>
