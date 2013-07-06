@@ -80,13 +80,12 @@ public class WFATMain {
 		+"Ulrich Kuehn <ukuehn@acm.org>\n\n"
 		+"Usage:\n"
 		+"java -jar wfat-"+version+".jar [options] "
-		+"<url> [<url>] ...\n\n"
+		+"[<url>] ...\n\n"
 		+"  where options are:\n\n"
-		+"  -N         Do not follow redirects.\n\n"
-		//+"  -F         Follow redirects. Use twice to also show "
-		//+"intermediate hops\n"
-		//+"             and also follow application-level redirects "
-		//+"(http-equiv).\n\n"
+		+"  -N         Do not follow redirects. Wins over -A.\n\n"
+		+"  -A         Follow application-level redirects, i.e. meta "
+		+"tags with\n"
+		+"             http-equiv=\"refresh\".\n\n"
 		+"  -v         Show all header fields and values, including "
 		+"application-level\n"
 		+"             headers (http-equiv). Use also to include "
@@ -150,6 +149,7 @@ public class WFATMain {
 	//int optRedirectCount = 0;
 	//boolean optRedirects = false;
 	boolean optNoRedirect = false;
+	boolean optFollowAppRedir = false;
 	boolean optStructHash = false;
 	//boolean optVerbRedirects = false;
 	boolean optCSV = false;
@@ -396,6 +396,8 @@ public class WFATMain {
 				optArgDelay = args[nextopt];
 			} else if (args[nextopt].equals("-N")) {
 				optNoRedirect = true;
+			} else if (args[nextopt].equals("-A")) {
+				optFollowAppRedir = true;
 			} else if (args[nextopt].equals("-H")) {
 				optStructHash = true;
 			//} else if (args[nextopt].equals("-F")) {
@@ -530,6 +532,7 @@ public class WFATMain {
 
 			HTTPFingerprint hfp = new HTTPFingerprint(pub, hc);
 			hfp.setNoRedirect(optNoRedirect);
+			hfp.setFollowAppRedirect(optFollowAppRedir);
 			hfp.setVerbose((verbLevel > 0));
 			hfp.setStructHash(optStructHash);
 			hfp.setDelay(delay);

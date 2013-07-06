@@ -62,6 +62,7 @@ public class HTTPFingerprint {
 
 
 	boolean noRedirect;
+	boolean followAppRedirect;
 	boolean verbose;
 	boolean doStructHash;
 	ConnectionHandler hc;
@@ -88,6 +89,7 @@ public class HTTPFingerprint {
 		pub = publisher;
 		hc = h;
 		noRedirect = false;
+		followAppRedirect = false;
 		verbose = false;
 		doStructHash = false;
 		delay = 0;
@@ -97,6 +99,11 @@ public class HTTPFingerprint {
 
 	public void setNoRedirect(boolean parm) {
 		noRedirect = parm;
+	}
+
+
+	public void setFollowAppRedirect(boolean parm) {
+		followAppRedirect = parm;
 	}
 
 
@@ -145,6 +152,7 @@ public class HTTPFingerprint {
 		int resp;
 		int redirState;
 		boolean initial;
+		boolean obtainContent;
 		HttpEquivResult er;
 		HtmlBuffer htmlBuf;
 		String alr;  // Application layer redirect from http-equiv
@@ -165,6 +173,10 @@ public class HTTPFingerprint {
 		}
 
 		pub.publishStart(targetUrl.toString());
+
+		obtainContent = (verbose ||
+				 followAppRedirect ||
+				 doStructHash);
 
 		u = targetUrl;
 		initial = true;
@@ -190,7 +202,6 @@ public class HTTPFingerprint {
 				break;
 			}
 			try {
-				//conn = hc.prepareConnection(u, proxy, false);
 				conn = hc.prepareConnection(u, false);
 				if (conn != null) {
 					resp = conn.getResponseCode();
@@ -206,14 +217,13 @@ public class HTTPFingerprint {
 			htmlBuf = null;
 			er = null;
 			alr = null;
-			if (!isRedirectCode(resp) &&
-			    (verbose || doStructHash)) {
+			if (!isRedirectCode(resp) && obtainContent) {
 				// Try to read document 
 				try {
 					htmlBuf = new HtmlBuffer(conn);
 				} catch (ParserException e) {
-					// Cannot read html doc, so
-					// we do not have one...
+					// Cannot read html doc, then
+					// we do not have one. That's fine...
 					if (Debug.get(
 						Debug.AppLayerRedirect) ||
 					    Debug.get(Debug.HTML)) {
@@ -227,7 +237,9 @@ public class HTTPFingerprint {
 				// redirect. Here only html-redirects
 				// using <meta http-equiv="refresh"...>
 				// are handled.
-				er = getAppLayerEquiv(htmlBuf);
+				if (htmlBuf != null) {
+					er = getAppLayerEquiv(htmlBuf);
+				}
 				if (er != null) {
 					alr = getAppLayerRedirect(er);
 				}
@@ -302,9 +314,9 @@ public class HTTPFingerprint {
 
 			// Get redirect location and start over
 			try {
-				String loc;
+				String loc = null;
 				URL base = u;
-				if (alr != null) {
+				if ((alr != null) && followAppRedirect) {
 					loc = alr;
 				} else {
 					loc = conn.getHeaderField("Location");
