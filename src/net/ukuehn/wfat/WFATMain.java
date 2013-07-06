@@ -125,7 +125,7 @@ public class WFATMain {
 		+"  -?         Print version, help and exit.\n\n"
 		+"  -P <proxyspec>  Specifiy HTTP proxy server. Formats for "
 		+"<proxyspec> are\n"
-		+"             <proxy>:<port>[:<uid>:<pw>] or "
+		+"             <proxy>[:<port>[:<uid>[:<pw>]]] or "
 		+"[<uid>[:<pw>]@]<proxy>[:<port>]\n"
 		+"             with optional basic authentication using user "
 		+"id <uid> and\n"

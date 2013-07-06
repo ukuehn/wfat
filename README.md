@@ -75,7 +75,7 @@ Options
   -?         Print version, help and exit.
 
   -P <proxyspec>  Specifiy HTTP proxy server. Formats for <proxyspec> are
-             <proxy>:<port>[:<uid>:<pw>] or [<uid>[:<pw>]@]<proxy>[:<port>]
+             <proxy>\[:<port>\[:<uid>\[:<pw>\]\]\] or \[<uid>\[:<pw>\]@]<proxy>\[:<port>\]
              with optional basic authentication using user id <uid> and
              password <pw>.
 
