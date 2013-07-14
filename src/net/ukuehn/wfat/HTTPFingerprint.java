@@ -321,8 +321,12 @@ public class HTTPFingerprint {
 				} else {
 					loc = conn.getHeaderField("Location");
 					// Location field must be
-					// absolute
-					base = null;
+					// absolute according to HTTP 1.1
+					// specification
+
+					// allow relative URLs, as some sites
+					// do it anyway
+					//base = null;
 				}
 				if (loc == null) {
 					break;

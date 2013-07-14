@@ -349,14 +349,19 @@ public class XMLFileReplay extends DefaultHandler {
 		} else if (XFS.VSRCEQUIV.equals(srcStr)) {
 			src = Publisher.EQUIV;
 		} else {
-			throw new SAXException("Unknown sourc attribute '"
+			throw new SAXException("Unknown source attribute '"
 					       +srcStr+"'");
 		}
 		if (XFS.VSRCHTTP.equals(srcStr) &&
 		    LOCATIONHDR.equalsIgnoreCase(keyStr)) {
 			redirectUrlStr = valStr;
 			try {
-				redirectUrl = new URL(redirectUrlStr);
+				// allow relative URL in redirection. This
+				// is against the HTTP 1.1 spec, but
+				// some sites do it anyway.
+				redirectUrl = new URL(responseUrl,
+						      redirectUrlStr);
+				//redirectUrl = new URL(redirectUrlStr);
 			} catch (MalformedURLException e) {
 				throw new SAXException("No URL: "
 						       +redirectUrlStr, e);
@@ -376,7 +381,13 @@ public class XMLFileReplay extends DefaultHandler {
 			}
 			String appLayerRedirect = valStr.substring(i+4);
 			try {
-				redirectUrl = new URL(appLayerRedirect);
+				// Allow relative URL in http equiv
+				// redirection. The HTTP 1.1 and HTML 4.01
+				// specs do not specify if it must be
+				// absolute or may be relative. So mimic
+				// typical browsers' behavior.
+				redirectUrl = new URL(responseUrl,
+						      appLayerRedirect);
 			} catch (MalformedURLException e) {
 				throw new SAXException("No URL: "
 						       +appLayerRedirect, e);
