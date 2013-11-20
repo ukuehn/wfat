@@ -144,7 +144,42 @@ public class HTTPFingerprint {
 	}
 
 
+	/* A wrapper for basic error handling, plus keeping xml output
+	 * structure intact.
+	 * It wraps the actual finger printing, and publishes possible
+	 * exception and errors. However, IOExceptions due to the
+	 * surrounding methods of the publisher are not catched.
+	 */
 	public void fingerprint(String urlStr)
+		throws IOException, ToolkitError {
+		URL targetUrl;
+		try {
+			targetUrl = hc.getURL(urlStr);
+			if (targetUrl == null) {
+				pub.publishStart(urlStr);
+				pub.publishException("Not an URL: "
+						     +urlStr);
+				pub.publishEnd();
+				return;
+			}
+		} catch (Exception e) {
+			// Output just the urlstr and nothing more,
+			// as we do not have a result...
+			pub.publishStart(urlStr);
+			pub.publishEnd();
+			return;
+		}
+		pub.publishStart(targetUrl.toString());
+		try {
+			fingerprint(targetUrl);
+		} catch (Exception e) {
+			pub.publishException(e.getMessage());
+		}
+		pub.publishEnd();
+	}
+
+
+	protected void fingerprint(URL urlParm)
 		throws IOException, ToolkitError {
 		HttpURLConnection conn;
 		URL u, currUrl, targetUrl;
@@ -158,26 +193,10 @@ public class HTTPFingerprint {
 		String alr;  // Application layer redirect from http-equiv
 		String errorMsg;
 
-		try {
-			targetUrl = hc.getURL(urlStr);
-			if (targetUrl == null) {
-				throw new MalformedURLException("Not an URL: "
-								+urlStr);
-			}
-		} catch (Exception e) {
-			// Output just the urlstr and nothing more,
-			// as we do not have a result...
-			pub.publishStart(urlStr);
-			pub.publishEnd();
-			return;
-		}
-
-		pub.publishStart(targetUrl.toString());
-
+		targetUrl = urlParm;
 		obtainContent = (verbose ||
 				 followAppRedirect ||
 				 doStructHash);
-
 		u = targetUrl;
 		initial = true;
 		maxRedirects = (noRedirect) ? 1 : 31;
@@ -294,7 +313,9 @@ public class HTTPFingerprint {
 					try {
 						handleHTML(htmlBuf, u);
 					} catch (ParserException e) {
-						throw new ToolkitError(e);
+						String err = e.getMessage();
+						pub.publishException(err);
+						//throw new ToolkitError(e);
 					}
 					break;
 				}
@@ -348,7 +369,6 @@ public class HTTPFingerprint {
 			}
 			initial = false;
 		}
-		pub.publishEnd();
 	}
 
 

@@ -540,7 +540,11 @@ public class WFATMain {
 
 			while (urlArgs.hasNext()) {
 				String urlarg = urlArgs.next();
-				hfp.fingerprint(urlarg);
+				try {
+					hfp.fingerprint(urlarg);
+				} catch (Exception e) {
+					// ignore for now
+				}
 			}
 			pub.publishGlobalEnd();
 		}
